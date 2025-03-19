@@ -39,10 +39,16 @@ psiblast -query SRY.fasta -db HSA_proteins_db -num_iterations=3 -evalue=1e-04 -o
 awk '$3 >90' s1-in-Ec >>above90 //from the given file print the values from 3rd coloumn which are higher than 90, append in file above90.
 awk '$3 > 90' sry-to-HSA_psiblast-3 >> paralogs.txt
 
-while read accession; do
-  wget -O "${accession}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=${accession}&rettype=fasta&retmode=text"
-done < accession_list.txt
+//get sequence bash file (create a directory to save fasta files)
+for id in $(cut -c14-19 SRY-to-HSA_psiblast-1)
+do
+    wget "https://rest.uniprot.org/uniprotkb/${id}.fasta"
+done
 
+cat *.fasta >> newfile.fasta (append all of them in one .fasta file)
+
+//meme motif
+meme RbcL_Proteins.fasta -protein -mod zoops -nmotifs 4 -minw 8 -maxw 16 -o resultmotif
 
 //FOR LOCAL ALIGNMENT
 needle -asequence ./aseq.txt -bsequence ./bseq.txt //w gopen 10, gext 1, outfile xyz.txt
@@ -52,6 +58,12 @@ water -asequence ./aseq.txt -bsequence ./bseq.txt //w gopen 10, gext 1, outfile 
 clustalo --infile=seq-no-outlier.txt  --output-order=input-order --outfile=seq-cl-off.aln --wrap=60 --outfmt=clu --force 
 //MSA
 t_coffee -infile=sequences.fasta -mode=accurate -output=clustalw -outfile=alignment.aln
+//MSA
+clustalw -> press 1     1. Sequence Input From Disc
+-> press 2      2. Multiple Alignments
+-> press 1     1.  Do complete multiple alignment now Slow/Accurate
+
+
 //structural alignment of protein seq
 MUSTANG:
 This will extract only 1 chain from both pdb files a chain and d chain.
