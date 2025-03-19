@@ -1,0 +1,64 @@
+//grep cmnds
+man grep //opens manual of grep cmnds
+grep ">" Ecoli.faa //prints every line that has ">" in given file
+grep ">" Ecoli.faa | wc -l //counts the number of file that has ">"
+grep -c ">" Ecoli.faa //counts no. of line that has ">", more effecient
+grep -i "Escherichia" Ecoli.faa //-i helps us ignore the lower-upper case of the word to be searched
+
+export BLASTDB=/home/BIOINFO/blastdb //setting env variable
+
+//BLAST 
+makeblastdb -in sequence.fasta -dbtype prot -out Human_to_HSS //making db of prot
+
+//blastp cmnds(takes prot seq gives prot output)
+blastp -query query.fasta -db swissprot -out results_protein.txt -evalue 1e-04 -outfmt 6 //used blastp for query seq against swissprot db
+blastp -query seq.fasta -db swissprot > blast.out //result gets stored in blast.out
+blastp -query dummy.fas -db nr -remote //-remote cmnd runs seq online against nr data in ncbi blast
+blastp -query dum2.fas -db swissprot //swissprot, pdbaa works in this system
+
+ThiQ(query id)	sp|O15440|MRP5_HUMAN(sub id)	29.032(%id)	217(align len)	110(no. mismatch)	9(no. of gopen)	20(qstrt)	219(qend)	583(sstrt)	772(send)	1.48e-10(e)	60.8(bit)
+
+awk '{print $2}' Thiq_to_HSA  | sort | uniq -c | awk '$1 > 1' | wc -l
+awk 'seen [$2]++' Thiq_hsa.txt | wc -l
+
+//blastn (takes nt gives nt output)
+blastn -query seq.fasta -db nucl -out my_db -evalue 1e-04 -outfmt 6 //evalue cutoff 1e-04, in tabular format
+
+//blastx (takes nt gives prot output)
+blastx -db <name> -query <input filename> -out <output filename> -evalue 1e-04 -outfmt 6
+
+//tblastn (takes prot gives nt output)
+tblastn -db <name> -query <input sequence> -out <output file name> -evalue 1e-04 -outfmt 6
+//highest hit:
+blastp -db HSA_db -query ThiQ.fasta -out Thiq_to_HSA_max -evalue 1e-04 -outfmt 6 -max_target_seqs 5
+
+//psiblast
+psiblast -query SRY.fasta -db HSA_proteins_db -num_iterations=1 -evalue=1e-04 -out ThiQ-to-HSA_psiblast-1 -out_pssm=PSSM1 -outfmt 6
+psiblast -query SRY.fasta -db HSA_proteins_db -num_iterations=2 -evalue=1e-04 -out ThiQ-to-HSA_psiblast-2 -out_pssm=PSSM2 -outfmt 6
+psiblast -query SRY.fasta -db HSA_proteins_db -num_iterations=3 -evalue=1e-04 -out ThiQ-to-HSA_psiblast-3 -out_pssm=PSSM3 -outfmt 6
+awk '$3 >90' s1-in-Ec >>above90 //from the given file print the values from 3rd coloumn which are higher than 90, append in file above90.
+awk '$3 > 90' sry-to-HSA_psiblast-3 >> paralogs.txt
+
+while read accession; do
+  wget -O "${accession}.fasta" "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=${accession}&rettype=fasta&retmode=text"
+done < accession_list.txt
+
+
+//FOR LOCAL ALIGNMENT
+needle -asequence ./aseq.txt -bsequence ./bseq.txt //w gopen 10, gext 1, outfile xyz.txt
+//FOR GLOBAL ALIGNMENT
+water -asequence ./aseq.txt -bsequence ./bseq.txt //w gopen 10, gext 1, outfile xyz.txt
+//FOR GLOBAL ALIGNMENT
+clustalo --infile=seq-no-outlier.txt  --output-order=input-order --outfile=seq-cl-off.aln --wrap=60 --outfmt=clu --force 
+//MSA
+t_coffee -infile=sequences.fasta -mode=accurate -output=clustalw -outfile=alignment.aln
+//structural alignment of protein seq
+MUSTANG:
+This will extract only 1 chain from both pdb files a chain and d chain.
+awk '($1~"^ATOM$" && $5~"^D$")' 3aqu.pdb  > 3aqu_d.pdb
+awk '($1~"^ATOM$" && $5~"^B$")' 1w9p.pdb  > 1w9p_b.pdb
+mustang -i 1w9p_b.pdb 3aqu_d.pdb -o<output filname>
+
+
+
+
