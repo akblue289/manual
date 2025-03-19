@@ -55,7 +55,8 @@ needle -asequence ./aseq.txt -bsequence ./bseq.txt //w gopen 10, gext 1, outfile
 //FOR GLOBAL ALIGNMENT
 water -asequence ./aseq.txt -bsequence ./bseq.txt //w gopen 10, gext 1, outfile xyz.txt
 //FOR GLOBAL ALIGNMENT
-clustalo --infile=seq-no-outlier.txt  --output-order=input-order --outfile=seq-cl-off.aln --wrap=60 --outfmt=clu --force 
+clustalo -i sequences.fasta -o alignment.aln --outfmt=clustal
+
 //MSA
 t_coffee -infile=sequences.fasta -mode=accurate -output=clustalw -outfile=alignment.aln
 //MSA
