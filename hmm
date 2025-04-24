@@ -1,0 +1,54 @@
+In hmmer
+sequences->alignment->profile->profile db
+SET – II
+1. Quick Recap using GAPDH hmm search
+-Take GAPDH( glyceraldehyde-3-phosphate dehydrogenase) protein sequences and search against
+human and E. coli protein data for the homologs.
+-You can output the data in two other formats.
+clustalo -i GAPDH.fasta -o GAPDH.clu -v
+hmmbuild GAPDH.hmm GAPDH.clu
+hmmsearch GAPDH.hmm Refseq_HS.fasta > GAPDH_HS_Out
+hmmsearch -o hmm.output1.txt --tblout hmm.tab.txt GAPDH.hmm Refseq_HS.fasta
+hmmsearch -o hmm.output2.txt --domtblout hmm.domtbl.txt GAPDH.hmm Refseq_HS.fasta
+
+2. Against bacterial database: Streptomyces coelicolor has multiple flavohemoglobins
+
+3. phmmer and jackhmmer
+Single sequence protein queries using phmmer
+phmmer GlobinBeta.fasta Refseq_HS.fasta > phmmer_Out
+jackhmmer GlobinBeta.fasta Refseq_HS.fasta > jackhmmer_Out
+Perform with another example:
+Use commandline blastp to contrast
+
+4. hmmemit- sample sequences from a profile
+hmmemit [ options ] hmmfile
+hmmemit -o emitseq Globins.hmm
+hmmemit -o emitseq5 -N 5 Globins.hmm
+5. hmmalign: make multiple sequence alignment using a profile
+
+hmmalign globins4.hmm globins.fa > OutFile
+The output of this is a Stockholm format multiple alignment file.
+7. Pfam-A
+head -1000 Pfam-A.hmm > FileInfo
+Count the number of entries in the file:
+grep "//" Pfam-A.hmm|wc
+19632 profiles are present in Pfam-A.hmm
+grep "NAME" Pfam-A.hmm|wc
+grep "^ACC" Pfam-A.hmm|wc
+For example, from a Pfam seed alignment flatfile Pfam-A.seed , you can do
+hmmbuild Pfam-A.hmm Pfam-A.seed
+
+hmmpress: prepare profile database for hmmscan
+hmmpress Pfam-A.hmm
+hmmstat: show summary statistics for a profile file
+The hmmstat program is a utility that summarizes the content of a profile database.
+hmmstat Pfam-A.hmm > Pfam_Profiles
+page 48 describes the headers of the table
+hmmfetch: retrieve profile(s) from a profile file
+By profile name:
+hmmfetch Pfam-A.hmm Calmodulin_bind > Prof_Name.hmm
+By profile accession:
+hmmfetch Pfam-A.hmm PF07887.14 > Prof_Accession.hmm
+hmmscan: search sequence against profile database
+hmmscan Pfam-A.hmm YP_009724390 > Glycoprotein_Out
+hmmscan Pfam-A.hmm Cov2_proteins.fasta > Cov2_Out
