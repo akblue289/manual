@@ -38,6 +38,7 @@ psiblast -query SRY.fasta -db HSA_proteins_db -num_iterations=2 -evalue=1e-04 -o
 psiblast -query SRY.fasta -db HSA_proteins_db -num_iterations=3 -evalue=1e-04 -out ThiQ-to-HSA_psiblast-3 -out_pssm=PSSM3 -outfmt 6
 awk '$3 >90' s1-in-Ec >>above90 //from the given file print the values from 3rd coloumn which are higher than 90, append in file above90.
 awk '$3 > 90' sry-to-HSA_psiblast-3 >> paralogs.txt
+awk '$2' 90_100.fasta | sort
 
 //get sequence bash file (create a directory to save fasta files)
 for id in $(cut -c14-19 SRY-to-HSA_psiblast-1)
