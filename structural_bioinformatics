@@ -110,12 +110,15 @@ spacing has to be 1 angstrom
 
 Example 
 
-x=60
-y=40
-z=56
-x center: 28.154
-y center: 30.24
-z center: 15.354
+receptor = protein.pdbqt
+
+center_x = 25.331 
+center_y = 29.681
+center_z = 14.848
+
+size_x = 44
+size_y = 58
+size_z = 76
 
 File → Close saving current
 Grid → Output → file name 1.gpf → save
