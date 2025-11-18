@@ -21,6 +21,41 @@ grep -vi "ANISOU" model-ns.pdb > model-an.pdb
 awk '((substr($0,17,1)=="A" || substr($0,17,1)==" ") && $1~"^ATOM$") {print substr($0,1,16), substr($0,18,63)} ' model-an.pdb > model-nr.pdb
 grep -vi "HOH" model-nr.pdb > model-final.pdb
 rm model-ns.pdb model-an.pdb model-nr.pdb
+1. To remove aniso:
+grep -vi aniso 4ppy.pdb > rem_aniso.pdb
+In PyMOL:
+remove not alt ''+A
+3. To remove a particular chain, chain C:
+awk '{if(substr($0,22,1)== "C" || $0~/^TER/)print $0}' rem_alt.pdb > chain_c.pdb
+
+In PyMOL:
+select chainC, chain C
+save chain_C.pdb, chainC  
+
+4. To remove hydrogen atoms:
+grep -v " H" only_B.pdb > clean_noH.pdb
+
+In PyMOL:
+load the chain_c.pdb file which has only C chain atoms)
+select hydrogens, name H*
+save only_H.pdb, hydrogens
+
+5. To remove non-standard amino acids:
+grep -E "^HETATM" 4fdi.pdb | awk '{print $4}' | sort -u
+In PyMOL, type in cmnd line,
+select mse_residues, resn MSE
+show sticks, mse_residues
+go to wizard>>mutagenesis>>pick the residue .. mutate to MET
+
+6. To compare 2 structures and find RMSD value:
+PyMOL:
+Open the two structures in PyMOL and align them to check RMSD value.
+Chimera:
+Open two structures --> Tools --> Sequence Comparison --> Matchmaker --> Select Reference and Structure to match --> Apply
+
+
+
+
 
 
 # Structural alignment with LSQMAN
