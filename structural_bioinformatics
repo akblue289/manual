@@ -1,0 +1,139 @@
+## SMILE TO PDB
+obabel -ismi retinol.smi -oPDB --gen3d > retinol.pdb
+
+# .sdf to .smi
+obabel -isdf ./Conformer3D_COMPOUND_CID_1983.sdf -osmi > paracetamol.smi
+
+## .smi to .pdbqt 
+obabel -ismi ibuprofen.smi -oPDB --gen3d -p gasteiger -O ibuprofen.pdbqt
+
+# generate structures from SMILE Sequences Discovery Studios
+1. Discovery Studio -> New Molecule Windows
+2. File -> Insert From -> SMILES & paste our SMILE sequence -> ok
+
+# pubchem sketcher
+pubchem.ncbi.nlm.nih.gov -> "Draw Structure" -> draw our desired structure
+-> "Search for This Structure" & look for related compounds matching SMILE sequence.
+
+## PDB CLEANING 
+grep -vi "SEQRES" model.pdb > model-ns.pdb
+grep -vi "ANISOU" model-ns.pdb > model-an.pdb
+awk '((substr($0,17,1)=="A" || substr($0,17,1)==" ") && $1~"^ATOM$") {print substr($0,1,16), substr($0,18,63)} ' model-an.pdb > model-nr.pdb
+grep -vi "HOH" model-nr.pdb > model-final.pdb
+rm model-ns.pdb model-an.pdb model-nr.pdb
+
+
+# Structural alignment with LSQMAN
+1. lsqman
+2. # Read structure from file 1n8k.pdb into molecule slot m1
+   re m1 1n8k.pdb
+3. # Read structure from file 1ye3.pdb into molecule slot m2
+   re m2 1ye3.pdb
+   
+  at all (or at ma or at ca)
+  ex
+4. # Extract residues 1-400 of chain A from m1 & residue 1 of chain A from m2
+   ex m1 A1-400 m2 A1
+5. # Align molecule m2 into m1
+   ap m1 m2
+6. # Save the aligned m2 coordinates into output file m2.pdb
+   wr m2 m2.pdb
+7. # Calculate & display matching atoms or residues
+   at ma
+
+
+
+
+###########################################################################################################################
+DISCOVERY STUDIO 
+###########################################################################################################################
+
+tools > receptor - ligant interaction > define site > from receptor cavities
+
+
+
+
+
+###########################################################################################################################
+AUTO DOCK 
+###########################################################################################################################
+
+In chimera, select protein (ctrl + shift +drag around protein ) and change it to a surface structure and
+change transparency to 40%
+
+Type adt in conda
+
+File → Read Molecule → protein.pdb
+Edit → Hydrogen → Add → all hydrogens
+Grid → Macromolecule → Choose → protein → save as protein.pdbqt
+Ligand → Input → Open → ligand.pdb
+Ligand → Output → save as .pdbqt
+Grid → Set Map Types → Choose ligand → select ligand
+Grid→ Grid box → cover entire protein with box
+grid dimension:
+spacing has to be 1 angstrom
+
+Example 
+
+x=60
+y=40
+z=56
+x center: 28.154
+y center: 30.24
+z center: 15.354
+
+File → Close saving current
+Grid → Output → file name 1.gpf → save
+Run → Run autogrid → filename: lig1.glg → cmd: autogrid4 -p ./1.gpf -l lig1.glg & → Launch (many
+files will be generated after this)
+Open .glg in text editor. If shows “successful completion” then go ahead with docking.
+Docking → Macromolecule → Set rigid filename → protein.pdbqt → Open
+Docking → Ligand → Choose → ligand → select ligand → Accept
+Docking → Search parameters → Genetic algorithm → Accept
+Docking → Output → Lamarckian →dock.dpf → Save
+Run → Run AutoDock → Parameter Filename: ./dock.dpf → Log Filename: ./dock.dlg → Cmd:
+autogrid4 -p ./dock.dpf -l dock.dlg &
+Dialog box appears. Its disappearance indicates completion of docking.
+Open dock.dlg from a text editor and search for "cluster". Will show a table of binding energies.
+
+grep -i “estimated” lig1.dlg
+analyze -> dockings -> open -> dock.dlg
+undisplay the original ligand
+Change the new ligand to sticks
+Deselect lines for protein
+Analyze -> Conformations -> Play ranked by energy -> Hit the forward button many times
+Choose molecular surface of protein to understand docking location wrt protein's surface
+Run docking again if ligand isn't deep inside
+choose ‘&’ → Write Complex → save as .pdb → Open .pdb file in Discovery Studio → View Interactions
+→ 2D diagram
+
+can use obabel to convert pdbqt to normal pdb (obabel -ipdbqt complex.pdbqt -opdb -O pose1.pdb)
+Add TER to pdb file
+
+
+By command in Auto dock vina
+vina
+Give parameters and put all this
+Search for vina config format->Autodock vina manual
+paste the center_x,center_y and z with size in config.txt
+28.6
+30.2
+22.5
+32
+36
+26
+save and exit in gedit
+vina --ligand ligand.pdbqt --config config.txt -out run1.pdbqt (mgltools prefer pdbqt for autodock vina
+results)
+adt
+analyze → autodock vina results → select run1.pdbqt → open protein also
+Add functional groups in gaps to fill binding pocket
+discovery studio has option to find the binding site of a protein
+In Discovery Studio,
+file >> open >> load protein.pdb >> chemistry >> add hydrogens >> receptor-ligand interactions
+define and edit binding sites-from pdbsite records >> define sites >> from receptor cavities >> go through
+binding sites with arrow buttons >> gives the scaffold to where ligand can bind >> load the ligand and see
+-find the best binding pocket (by 6 residues above,bottom and side)
+
+if not, go to some online sites >> find binding point >> find 6 residues above, below, front back, right, left
+to find
